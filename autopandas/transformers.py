@@ -4,6 +4,10 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression
 
 class LabelEncoderFix(LabelEncoder):
+    """
+    Just correction of encoder.
+    To be deleted.
+    """
     def fit(self, y):
         return super().fit(y.astype(str))
 
@@ -14,16 +18,10 @@ class LabelEncoderFix(LabelEncoder):
         return super().fit_transform(y.astype(str))
 
 class CategoryTransformer(TransformerMixin):
-
-    def __init__(self):
-        """Impute missing values.
-
-        Columns of dtype object are imputed with the most frequent value 
-        in column.
-
-        Columns of other types are imputed with mean of column.
-
-        """
+    """Impute missing values.
+       Columns of dtype object are imputed with the most frequent value in column.
+       Columns of other types are imputed with mean of column.
+    """
 
     def unique(self, x):
         """ calculation of unique values in array
@@ -75,7 +73,7 @@ class CategoryTransformer(TransformerMixin):
 class LinearImputer(TransformerMixin):
     def __init__(self, **kwargs):
         self.model = None
-        return super().__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def fit(self, X, y=None):
         if y is None:
