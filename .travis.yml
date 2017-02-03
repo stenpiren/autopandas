@@ -5,7 +5,7 @@ python:
   - "3.2"
   - "3.3"
 # command to install dependencies
-script: python test/test_transformers.py
+script: python -m unittest test_transformers
 branches:
   only:
     - master
