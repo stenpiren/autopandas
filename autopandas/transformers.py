@@ -1,3 +1,7 @@
+"""
+ Collection of transformers for autopandas
+"""
+
 import numpy as np
 from sklearn.base import TransformerMixin
 from sklearn.preprocessing import LabelEncoder
@@ -23,7 +27,11 @@ class CategoryTransformer(TransformerMixin):
        Columns of other types are imputed with mean of column.
     """
 
-    def unique(self, x):
+    def __init__(self, **kwargs):
+        self.fill = []
+        super().__init__(kwargs)
+
+    def unique(self, data):
         """ calculation of unique values in array
         numpy calculation fails if contains nan
         """
@@ -31,16 +39,21 @@ class CategoryTransformer(TransformerMixin):
         unique = []
         counts = []
 
-        for c in x:
-            if c[0] in unique:
-                counts[unique.index(c[0])] += 1
+        for row in data:
+            if row[0] in unique:
+                counts[unique.index(row[0])] += 1
             else:
-                unique.append(c[0])
+                unique.append(row[0])
                 counts.append(1)
 
         return unique, counts
 
     def fit(self, X, y=None):
+        """
+        Fit transformer
+        """
+        if y != None:
+            raise NotImplementedError
 
         self.fill = []
         if len(X.shape) == 1 or X.shape[1] == 1:
@@ -49,8 +62,8 @@ class CategoryTransformer(TransformerMixin):
             self.fill.append([ind, unique, counts])
         else:
             columns = X.shape[1]
-            for c in range(columns):
-                unique, counts = self.unique(X[c])
+            for column in range(columns):
+                unique, counts = self.unique(X[column])
                 ind = np.argmax(counts)
                 self.fill.append([ind, unique, counts])
 
@@ -79,11 +92,11 @@ class LinearImputer(TransformerMixin):
         if y is None:
             train = X[~np.isnan(X).any(axis=1)]
         else:
-            train  = np.concatenate((X,y), axis = 1)[~np.isnan(data).any(axis=1)]
+            train = np.concatenate((X, y), axis = 1)[~np.isnan(X).any(axis=1)]
 
-        x_train = train[:,1:]
-        y_train = train[:,0:1]
-        
+        x_train = train[:, 1:]
+        y_train = train[:, 0:1]
+
 
         self.model = LinearRegression()
         self.model.fit(x_train, y_train)
