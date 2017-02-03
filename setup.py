@@ -10,4 +10,5 @@ setup(name='autopandas',
       author_email='boris@tvaroska.sk',
       license='MIT',
       packages=['autopandas'],
+      install_requires=['numpy', 'scipy', 'sklearn', 'pandas'],
       zip_safe=False)
