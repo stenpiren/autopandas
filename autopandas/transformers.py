@@ -95,5 +95,5 @@ class LinearImputer(TransformerMixin):
         result = np.array(X, copy=True)
         for row in result:
             if np.isnan(row[0]):
-                row[0] = self.model.predict(row[1:])
+                row[0] = self.model.predict(row[1:].reshape(1,-1))
         return result
