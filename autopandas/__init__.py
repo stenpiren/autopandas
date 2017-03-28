@@ -1,3 +1,11 @@
+import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
+
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import Imputer, RobustScaler
+
+from .transformers import CategoryTransformer
+
 class autopandas(BaseEstimator, TransformerMixin):
     def __init__(self, level = 0, ignore=[], drop_at = 0.8, categories = 0.1, **kwargs):
 
@@ -22,11 +30,11 @@ class autopandas(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         non_empty = X.count()
-        for column in titanic.columns:
+        for column in X.columns:
             if column in self.ignore:
                 continue
             complete    = ("full" if X.shape[0] == non_empty[column] else "partial")
-            unique      = len(titanic[column].unique())
+            unique      = len(X[column].unique())
 
             # TODO: categorical identification
             if X.dtypes[column] in [np.float64, np.int64]:
