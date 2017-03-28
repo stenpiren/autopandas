@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from sklearn.pipeline import Pipeline
@@ -7,8 +8,9 @@ from sklearn.preprocessing import Imputer, RobustScaler
 from .transformers import CategoryTransformer
 
 class autopandas(BaseEstimator, TransformerMixin):
-    def __init__(self, level = 0, ignore=[], drop_at = 0.8, categories = 0.1, **kwargs):
+    def __init__(self, pandas = True, level = 0, ignore=[], drop_at = 0.8, categories = 0.1, **kwargs):
 
+        self.pandas = pandas
         self.level = level
 
         self.drop_at    = drop_at
@@ -101,10 +103,25 @@ class autopandas(BaseEstimator, TransformerMixin):
                     data = column[1].transform(X[column[0]].reshape(-1,1))
                 else:
                     data = column[1].transform(X[column[0]])
-                if res is None:
-                    res = data
+
+                if self.pandas:
+                    # result will be pandas DataFrame
+                    if res is None:
+                        res = pd.DataFrame()
+                    for i in range(data.shape[1]):
+                        if data.shape[1] == 1:
+                            column_name = column[0]
+                        else:
+                            column_name = "{0}_{1}".format(column[0], i)
+                        res[column_name] = pd.Series(data[:,i])
+                    # column to check if original value is NaN
+                    res["{0}_NaN".format(column[0])] = [True if pd.isnull(v) else False for v in X[column[0]]]
                 else:
-                    res = np.concatenate((res, data), axis=1)
+                    # result will be numpy array
+                    if res is None:
+                        res = data
+                    else:
+                        res = np.concatenate((res, data), axis=1)
 
         return res
 
